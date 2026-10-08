@@ -81,8 +81,26 @@
                 x: snake[0].x + direction.x,
                 y: snake[0].y + direction.y
             };
+            const ateFood = head.x === food.x && head.y === food.y;
+
+            if (ateFood) {
+                score++;
+                document.getElementById("info").textContent = `Score: ${score}`;
+            }
+
             snake.unshift(head);
-            snake.pop();
+            if (!ateFood) {
+                snake.pop();
+            }
+            else {
+                score++;
+                let newFood;
+                do {
+                    newFood = createFood();
+                } while (isOnSnake(newFood));
+                food = newFood;
+            }
+
 
             drawGame();
         };
@@ -119,6 +137,19 @@
             }
         });
         // Step 3: Eating and growing
+        const createFood = () => {
+            return {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+        };
+
+        const isOnSnake = (position) =>
+        snake.some(segment =>
+        segment.x === position.x && segment.y === position.y
+        );
+    
+
         // Step 4: Game over
         // Step 5: Improvements
         //
