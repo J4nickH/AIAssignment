@@ -36,6 +36,7 @@
         let nextDirection = { x: 1, y: 0 };
         let food = { x: 15, y: 15 };
         let score = 0;
+        let directionQueue = [];
 
         // ===== DRAWING =====
         const drawGame = () => {
@@ -73,7 +74,9 @@
 
         const moveSnake = () => {
             // Move the snake
-            direction = nextDirection;
+            if (directionQueue.length > 0) {
+                direction = directionQueue.shift();
+            }
             const head = {
                 x: snake[0].x + direction.x,
                 y: snake[0].y + direction.y
@@ -88,27 +91,29 @@
         setInterval(moveSnake, mooveInterval);
         // Step 2: Keyboard controls (arrow keys)
         document.addEventListener("keydown", (event) => {
-            switch (event.key) {
-                case "ArrowUp":
-                    if (direction.y === 0) {
-                        nextDirection = { x: 0, y: -1 };
-                    }
-                    break;
-                case "ArrowDown":
-                    if (direction.y === 0) {
-                        nextDirection = { x: 0, y: 1 };
-                    }
-                    break;
-                case "ArrowLeft":
-                    if (direction.x === 0) {
-                        nextDirection = { x: -1, y: 0 };
-                    }
-                    break;
-                case "ArrowRight":
-                    if (direction.x === 0) {
-                        nextDirection = { x: 1, y: 0 };
-                    }
-                    break;
+            if (directionQueue.length < 2) {
+                switch (event.key) {
+                    case "ArrowUp":
+                        if (direction.y !== 1) {
+                            directionQueue.push({ x: 0, y: -1 });
+                        }
+                        break;
+                    case "ArrowDown":
+                        if (direction.y !== -1) {
+                            directionQueue.push({ x: 0, y: 1 });
+                        }
+                        break;
+                    case "ArrowLeft":
+                        if (direction.x !== 1) {
+                            directionQueue.push({ x: -1, y: 0 });
+                        }
+                        break;
+                    case "ArrowRight":
+                        if (direction.x !== -1) {
+                            directionQueue.push({ x: 1, y: 0 });
+                        }
+                        break;
+                }
             }
         });
         // Step 3: Eating and growing
