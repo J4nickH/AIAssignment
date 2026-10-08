@@ -33,7 +33,7 @@
             { x: 8, y: 10 }
         ];
         let direction = { x: 1, y: 0 };
-        let nextDirection = { x: 1, y: 0 };
+        let newDirection = { x: 1, y: 0 };
         let food = { x: 15, y: 15 };
         let score = 0;
         let directionQueue = [];
@@ -94,25 +94,27 @@
             if (directionQueue.length < 2) {
                 switch (event.key) {
                     case "ArrowUp":
-                        if (direction.y !== 1) {
-                            directionQueue.push({ x: 0, y: -1 });
-                        }
+                        newDirection = { x: 0, y: -1 };
                         break;
                     case "ArrowDown":
-                        if (direction.y !== -1) {
-                            directionQueue.push({ x: 0, y: 1 });
-                        }
+                        newDirection = { x: 0, y: 1 };
                         break;
                     case "ArrowLeft":
-                        if (direction.x !== 1) {
-                            directionQueue.push({ x: -1, y: 0 });
-                        }
+                        newDirection = { x: -1, y: 0 };
                         break;
                     case "ArrowRight":
-                        if (direction.x !== -1) {
-                            directionQueue.push({ x: 1, y: 0 });
-                        }
+                        newDirection = { x: 1, y: 0 };
                         break;
+                }
+                const plannedDirection = directionQueue.length
+                ? directionQueue[directionQueue.length - 1]
+                : direction;
+
+                const isOpposite = newDirection.x === -plannedDirection.x &&
+                newDirection.y === -plannedDirection.y;
+
+                if (!isOpposite && directionQueue.length < 2) {
+                    directionQueue.push(newDirection);
                 }
             }
         });
