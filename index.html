@@ -37,6 +37,8 @@
         let food = { x: 15, y: 15 };
         let score = 0;
         let directionQueue = [];
+        let gameTimer;
+        let gameOver = false;
 
         // ===== DRAWING =====
         const drawGame = () => {
@@ -71,11 +73,30 @@
         // Commit regularly.
         //
         // Step 1: Movement (game loop)
+        const restartGame = () => {
+            snake = [
+             { x: 10, y: 10 },
+                { x: 9, y: 10 },
+                { x: 8, y: 10 }
+            ];
+            direction = { x: 1, y: 0 };
+            newDirection = { x: 1, y: 0 };
+            directionQueue = [];
+            food = { x: 15, y: 15 };
+            score = 0;
+            gameOver = false;
+            info.textContent = "Score: 0";
+            drawGame();
+            gameTimer = setInterval(moveSnake, mooveInterval);
+        };
 
+        
+        const info = document.getElementById("info");
         const endGame = () => {
+            gameOver = true;
             clearInterval(gameTimer);
-            document.getElementById("info").textContent =
-            `Game over! Score: ${score}`;
+            info.textContent =
+            `Game over! Score: ${score}. Press Space or Enter to restart.`;
         };
 
         const moveSnake = () => {
@@ -95,17 +116,13 @@
 
             const ateFood = head.x === food.x && head.y === food.y;
 
-            if (ateFood) {
-                score++;
-                document.getElementById("info").textContent = `Score: ${score}`;
-            }
-
             snake.unshift(head);
             if (!ateFood) {
                 snake.pop();
             }
             else {
                 score++;
+                document.getElementById("info").textContent = `Score: ${score}`;
                 let newFood;
                 do {
                     newFood = createFood();
@@ -120,9 +137,20 @@
         };
 
         const mooveInterval = 300;
-        setInterval(moveSnake, mooveInterval);
+        gameTimer = setInterval(moveSnake, mooveInterval);
         // Step 2: Keyboard controls (arrow keys)
         document.addEventListener("keydown", (event) => {
+        if (gameOver &&
+            (event.key === " " || event.key === "Enter")) {
+            restartGame();
+            return;
+        }
+
+        if (gameOver) {
+            return;
+        }
+
+
             if (directionQueue.length < 2) {
                 switch (event.key) {
                     case "ArrowUp":
