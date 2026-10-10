@@ -15,7 +15,8 @@
 
     <h1>Snake</h1>
     <canvas id="gameCanvas" width="400"
-            height="400"></canvas>
+            height="400" position="relative"></canvas>
+    <div id="overlay" style="position: absolute"></div>        
     <p id="info"></p>
 
     <script>
@@ -25,6 +26,7 @@
         const ctx = canvas.getContext("2d");
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
+        const overlay = document.getElementById("overlay");
 
         // ===== INITIAL STATE =====
         let snake = [
@@ -38,8 +40,10 @@
         let score = 0;
         let directionQueue = [];
         let gameTimer;
-        let gameOver = false;
-
+        let gameState = "start"; // "start", "playing", "paused", "gameOver"
+        
+        let titel = "Snake Game";
+        let message = "Press Space or Enter to start the game.";
         // ===== DRAWING =====
         const drawGame = () => {
             ctx.clearRect(0, 0,
@@ -74,31 +78,11 @@
         // Commit regularly.
         //
         // Step 1: Movement (game loop)
-        const restartGame = () => {
-            snake = [
-             { x: 10, y: 10 },
-                { x: 9, y: 10 },
-                { x: 8, y: 10 }
-            ];
-            direction = { x: 1, y: 0 };
-            newDirection = { x: 1, y: 0 };
-            directionQueue = [];
-            food = { x: 15, y: 15 };
-            score = 0;
-            gameOver = false;
-            //info.textContent = "Score: 0";
-            drawGame();
-            startGameTimer();
-        };
+        
 
         
         const info = document.getElementById("info");
-        const endGame = () => {
-            gameOver = true;
-            clearInterval(gameTimer);
-            info.textContent =
-            `Game over! Score: ${score}. Press Space or Enter to restart.`;
-        };
+
 
         const moveSnake = () => {
             // Move the snake
@@ -110,7 +94,7 @@
                 y: snake[0].y + direction.y
             };
             if (isOutsideGrid(head) || hitsSnake(head)) {
-                endGame();
+                endGame(score);
                 return;
             }
 
@@ -143,13 +127,30 @@
 
         // Step 2: Keyboard controls (arrow keys)
         document.addEventListener("keydown", (event) => {
-            if (gameOver &&
-                (event.key === " " || event.key === "Enter")) {
-                restartGame();
+            if (gameState === "start") {
+                if (event.key === " " || event.key === "Enter") {
+                    gameState = "playing";
+                    beginGame();
+                }
                 return;
             }
+            if (gameState === "paused" &&
+                (event.key === " " || event.key === "Enter")) {
+                gameState = "playing";
+                continueGame();
+                return;
+            }
+            
+            if (gameState === "gameOver" &&
+                (event.key === " " || event.key === "Enter")) {
+                beginGame();
+                return;
+            }
+ 
 
-            if (gameOver) {
+            if (event.key === "Escape") {
+                gameState = "paused";
+                pauseGame(score);
                 return;
             }
 
@@ -225,9 +226,53 @@
         };
         //
         // ===================================
-        drawGame();
-        startGameTimer();
 
+        const beginGame = () => {
+            snake = [
+             { x: 10, y: 10 },
+                { x: 9, y: 10 },
+                { x: 8, y: 10 }
+            ];
+            direction = { x: 1, y: 0 };
+            newDirection = { x: 1, y: 0 };
+            directionQueue = [];
+            food = { x: 15, y: 15 };
+            score = 0;
+            gameState = "playing";
+            overlay.style.display = "none";
+            drawGame();
+            startGameTimer();
+        };
+
+        const continueGame = () => {
+            gameState = "playing";
+            overlay.style.display = "none";
+            drawGame();
+            startGameTimer();
+        };
+
+        const pauseGame = (score) => {
+            gameState = "paused";
+            let titel = 'Game Paused - Score: ' + score;
+            let message = "Press Space or Enter to continue.";
+            showScreen(titel, message);
+            clearInterval(gameTimer); 
+        };
+
+        const endGame = (score) => {
+            gameState = "gameOver";
+            clearInterval(gameTimer);
+            let titel = 'Game Over - Score:' + score;
+            let message = "Press Space or Enter to restart.";
+            showScreen(titel, message); 
+        };
+
+
+        const showScreen = (title, message) => {
+            overlay.innerHTML = `<h2>${title}</h2><p>${message}</p>`;
+            overlay.style.display = "flex";
+        };
+        showScreen(titel, message);
     </script>
 
 </body>
