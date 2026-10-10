@@ -60,9 +60,10 @@
                     gridSize, gridSize
                 );
             }
+            document.getElementById("info").textContent = `Score: ${score}`;
         };
 
-        drawGame();
+
 
         // ===================================
         // BUILD THE GAME FROM HERE
@@ -85,9 +86,9 @@
             food = { x: 15, y: 15 };
             score = 0;
             gameOver = false;
-            info.textContent = "Score: 0";
+            //info.textContent = "Score: 0";
             drawGame();
-            gameTimer = setInterval(moveSnake, mooveInterval);
+            startGameTimer();
         };
 
         
@@ -122,33 +123,35 @@
             }
             else {
                 score++;
-                document.getElementById("info").textContent = `Score: ${score}`;
+                
                 let newFood;
                 do {
                     newFood = createFood();
                 } while (isOnSnake(newFood));
                 food = newFood;
+                startGameTimer();
+                //document.getElementById("info").textContent = `Score: ${score}`;
             }
-
-            
-
-
             drawGame();
+            
         };
 
-        const mooveInterval = 300;
-        gameTimer = setInterval(moveSnake, mooveInterval);
+        const startGameTimer = () => {
+            clearInterval(gameTimer);
+            gameTimer = setInterval(moveSnake, getMoveInterval());
+        };
+
         // Step 2: Keyboard controls (arrow keys)
         document.addEventListener("keydown", (event) => {
-        if (gameOver &&
-            (event.key === " " || event.key === "Enter")) {
-            restartGame();
-            return;
-        }
+            if (gameOver &&
+                (event.key === " " || event.key === "Enter")) {
+                restartGame();
+                return;
+            }
 
-        if (gameOver) {
-            return;
-        }
+            if (gameOver) {
+                return;
+            }
 
 
             if (directionQueue.length < 2) {
@@ -187,8 +190,8 @@
         };
 
         const isOnSnake = (position) =>
-        snake.some(segment =>
-        segment.x === position.x && segment.y === position.y
+            snake.some(segment =>
+            segment.x === position.x && segment.y === position.y
         );
     
 
@@ -205,8 +208,25 @@
 
 
         // Step 5: Improvements
+        // Speed up
+        const baseInterval = 300;
+        const minimumInterval = 80;
+        const speedFactor = 0.95;
+
+        const getMoveInterval = () => {
+            if (score === 0) {
+                return baseInterval;
+            }
+            const speedSteps = Math.floor(score / 2);
+            return Math.max(
+                minimumInterval,
+                baseInterval * Math.pow(speedFactor, speedSteps)
+            );
+        };
         //
         // ===================================
+        drawGame();
+        startGameTimer();
 
     </script>
 
