@@ -72,6 +72,12 @@
         //
         // Step 1: Movement (game loop)
 
+        const endGame = () => {
+            clearInterval(gameTimer);
+            document.getElementById("info").textContent =
+            `Game over! Score: ${score}`;
+        };
+
         const moveSnake = () => {
             // Move the snake
             if (directionQueue.length > 0) {
@@ -81,6 +87,12 @@
                 x: snake[0].x + direction.x,
                 y: snake[0].y + direction.y
             };
+            if (isOutsideGrid(head) || hitsSnake(head)) {
+                endGame();
+                return;
+            }
+
+
             const ateFood = head.x === food.x && head.y === food.y;
 
             if (ateFood) {
@@ -100,6 +112,8 @@
                 } while (isOnSnake(newFood));
                 food = newFood;
             }
+
+            
 
 
             drawGame();
@@ -151,6 +165,17 @@
     
 
         // Step 4: Game over
+        const isOutsideGrid = (position) => 
+            position.x < 0 || position.x >= tileCount ||
+            position.y < 0 || position.y >= tileCount;
+        
+        const hitsSnake = (head) => 
+            snake.slice(1).some(segment =>
+            segment.x === head.x && segment.y === head.y
+        );
+        
+
+
         // Step 5: Improvements
         //
         // ===================================
