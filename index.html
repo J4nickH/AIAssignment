@@ -73,6 +73,14 @@
         const drawGame = () => {
             ctx.clearRect(0, 0,
                 canvas.width, canvas.height);
+            for (let y = 0; y < tileCount; y++) {
+                for (let x = 0; x < tileCount; x++) {
+                    ctx.fillStyle = (x + y) % 2 === 0
+                        ? "#A9D751"
+                        : "#A2D049";
+                    ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+                }
+            }
 
             ctx.fillStyle = "red";
             ctx.fillRect(
@@ -81,14 +89,20 @@
                 gridSize, gridSize
             );
 
-            ctx.fillStyle = "black";
-            for (const segment of snake) {
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    ctx.fillStyle = "#000000"; // Head color
+                } else {
+                    ctx.fillStyle = index % 2 === 0
+                        ? "#4876EE"
+                        : "#2B58BF"; 
+                }
                 ctx.fillRect(
                     segment.x * gridSize,
                     segment.y * gridSize,
                     gridSize, gridSize
                 );
-            }
+            });
             document.getElementById("info").textContent = `Score: ${score}`;
         };
 
