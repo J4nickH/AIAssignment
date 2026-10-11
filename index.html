@@ -64,7 +64,9 @@
         let directionQueue = [];
         let gameTimer;
         let gameState = "start"; // "start", "playing", "paused", "gameOver"
-        
+        let highScore = 0;
+        let oldhighScore = 0;
+
         let titel = "Snake Game";
         let message = "Press Space or Enter to start the game.";
         // ===== DRAWING =====
@@ -289,8 +291,14 @@
         const endGame = (score) => {
             gameState = "gameOver";
             clearInterval(gameTimer);
-            let titel = 'Game Over - Score:' + score;
-            let message = "Press Space or Enter to restart.";
+            if (score > highScore) {
+                highScore = score;
+                titel = 'New High Score: ' + highScore;
+                message = "Press Space or Enter to restart.";
+            } else {
+                titel = 'Game Over - Score: ' + score;
+                message = "Press Space or Enter to restart.";
+            }
             showScreen(titel, message); 
         };
 
